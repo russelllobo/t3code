@@ -31,7 +31,7 @@ export function WorkspaceSidebarTabs(props: {
   const selectTab = useSelectWorkspaceTab();
   const selectedTab = tabs.includes(workspace.state.selectedTab)
     ? workspace.state.selectedTab
-    : tabs[0];
+    : (tabs[0] ?? "");
   const { colors, colorScheme } = useControlTheme();
   // UIKit loses accessible names when updating nil-titled items in place.
   const tabBarKey = tabs.join(":");
