@@ -44,6 +44,14 @@ fi
 
 echo "==> Archiving build $BUILD_NUMBER"
 rm -rf "$ARCHIVE_PATH" "$EXPORT_PATH"
+
+# Expo writes CFBundleVersion as a literal, so the xcodebuild override alone
+# does not change it. Patch the generated Info.plist so every upload gets a
+# unique build number.
+if [[ -f ios/T3CodeDesign/Info.plist ]]; then
+  /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/T3CodeDesign/Info.plist
+fi
+
 xcodebuild \
   -workspace ios/T3CodeDesign.xcworkspace \
   -scheme T3CodeDesign \
