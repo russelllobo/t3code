@@ -136,7 +136,6 @@ export function workspaceToolbarHeight(mode: WorkspaceSearchMode): number {
 export const NATIVE_WORKSPACE_TAB_SLOTS = ["first", "second", "third", "fourth"] as const;
 
 export function workspaceTabForNativeSlot(order: readonly WorkspaceTab[], slot: string) {
-  if (slot === "settings") return "settings";
   const index = NATIVE_WORKSPACE_TAB_SLOTS.findIndex((candidate) => candidate === slot);
   return order[index] ?? null;
 }

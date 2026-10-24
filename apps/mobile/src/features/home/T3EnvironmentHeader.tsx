@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
-import { isRelayManagedConnection } from "../lib/connection";
-import { cn } from "../lib/cn";
-import { useSavedRemoteConnections } from "../state/use-remote-environment-registry";
-import { AppText as Text } from "../components/ui/AppText";
-import { SymbolView, type AppSymbolName } from "../components/ui/AppSymbol";
-import { T3Wordmark } from "../components/T3Wordmark";
+import { isRelayManagedConnection } from "../../lib/connection";
+import { cn } from "../../lib/cn";
+import { useSavedRemoteConnections } from "../../state/use-remote-environment-registry";
+import { AppText as Text } from "../../components/ui/AppText";
+import { SymbolView, type AppSymbolName } from "../../components/ui/AppSymbol";
+import { T3Wordmark } from "../../components/T3Wordmark";
 import type { EnvironmentId } from "@t3tools/contracts";
 import { useHomeListOptions } from "./home-list-options";
 
