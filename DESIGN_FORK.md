@@ -73,7 +73,8 @@ The script reads its signing identity from the repo-root `.env`. It uses an
 App Store Connect API key for Xcode's automatic signing and an app-specific
 password for `altool` upload. Neither secret belongs in git.
 
-App Store Connect record: `T3 Code Design` (`com.russellsystems.t3design`).
+App Store Connect record: `T3 Code Design` (`com.russellsystems.t3design`,
+app ID `6826558609`, SKU `t3code-design`).
 
 ## Design iteration loop
 
