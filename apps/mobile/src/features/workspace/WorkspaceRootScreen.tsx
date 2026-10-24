@@ -8,7 +8,8 @@ import { Platform, View, useWindowDimensions } from "react-native";
 import { useKeyboardState } from "react-native-keyboard-controller";
 import { SafeAreaInsetsContext, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { CompactBrandTitle } from "../../components/CompactBrandTitle";
+import { T3EnvironmentHeader } from "../home/T3EnvironmentHeader";
+import { useAdaptiveWorkspaceLayout } from "../layout/AdaptiveWorkspaceLayout";
 import { AndroidScreenHeader } from "../../components/ui/AndroidScreenHeader";
 import { NativeStackScreenOptions } from "../../native/StackHeader";
 import { NativePrimaryColumnContext } from "../../native/v5-workspace-context";
@@ -23,8 +24,6 @@ import {
 } from "../../native/native-layout-metrics";
 import { HomeRouteScreen } from "../home/HomeRouteScreen";
 import { dispatchHardwareKeyboardCommand } from "../keyboard/hardwareKeyboardCommands";
-import { WorkspaceConnectionTitle } from "../home/WorkspaceConnectionTitle";
-import { useAdaptiveWorkspaceLayout } from "../layout/AdaptiveWorkspaceLayout";
 import { PullRequestsScreen } from "../pull-requests/PullRequestsScreen";
 import {
   WorkspaceTabsContext,
@@ -49,23 +48,9 @@ const TAB_TITLES = WORKSPACE_TAB_LABELS;
 
 function WorkspaceRootTitle(props: {
   readonly maxWidth: number;
-  readonly onOpenEnvironments: () => void;
+  readonly onOpenSettings: () => void;
 }) {
-  const { state } = useWorkspaceTabs()!;
-  const enabled = useEnabledNavigationTabs();
-  return (
-    <View style={{ width: props.maxWidth, minHeight: 32, justifyContent: "center" }}>
-      <WorkspaceConnectionTitle
-        brand={
-          <CompactBrandTitle
-            accessibilityLabel={`T3 Code, ${enabled.length ? TAB_TITLES[state.selectedTab] : "Navigation"}`}
-          />
-        }
-        maxWidth={props.maxWidth}
-        onPress={props.onOpenEnvironments}
-      />
-    </View>
-  );
+  return <T3EnvironmentHeader maxWidth={props.maxWidth} onOpenSettings={props.onOpenSettings} />;
 }
 
 function WorkspaceRootContent() {
@@ -96,11 +81,11 @@ function WorkspaceRootContent() {
   const renderHeaderTitle = useCallback(
     () => (
       <WorkspaceRootTitle
-        maxWidth={Math.max(0, width - 160)}
-        onOpenEnvironments={() =>
+        maxWidth={Math.max(0, width - 150)}
+        onOpenSettings={() =>
           navigation.navigate("SettingsSheet", {
             screen: "SettingsContent",
-            params: { screen: "SettingsEnvironments" },
+            params: { screen: "Settings" },
           })
         }
       />
@@ -158,6 +143,7 @@ function WorkspaceRootContent() {
                 ? { headerSearchBarOptions: undefined, unstable_headerRightItems: () => [] }
                 : {}),
               unstable_headerLeftItems: () => [],
+              headerTitleAlign: "left",
               headerTitle: state.selectedTab === "usage" ? undefined : renderHeaderTitle,
             }}
           />
@@ -178,15 +164,6 @@ function WorkspaceRootContent() {
                     },
                   ]
                 : []),
-              {
-                accessibilityLabel: "Settings",
-                icon: "gearshape",
-                onPress: () =>
-                  navigation.navigate("SettingsSheet", {
-                    screen: "SettingsContent",
-                    params: { screen: "Settings" },
-                  }),
-              },
             ]}
           />
         )}

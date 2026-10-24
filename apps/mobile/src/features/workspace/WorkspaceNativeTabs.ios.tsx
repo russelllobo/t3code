@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import {
   WORKSPACE_TAB_LABELS,
   NAVIGATION_TAB_ICONS,
@@ -9,7 +8,6 @@ import { Keyboard, View, useWindowDimensions, type NativeSyntheticEvent } from "
 import {
   Tabs,
   type TabSelectedEvent,
-  type TabSelectionPreventedEvent,
   type TabSelectionRejectedEvent,
 } from "react-native-screens";
 
@@ -65,8 +63,6 @@ export function WorkspaceNativeTabs(props: {
   const workspace = useWorkspaceTabs()!;
   const order = useEnabledNavigationTabs();
   const primaryTabs = order.slice(0, 4);
-  const overflow = order[4];
-  const navigation = useNavigation();
   const [provenance, setProvenance] = useState(0);
   const systemTabBar = useSystemWorkspaceTabBar();
   const deviceType = useDeviceType();
@@ -76,14 +72,14 @@ export function WorkspaceNativeTabs(props: {
   const { width } = useWindowDimensions();
   const { colors } = useControlTheme();
   const selectedTab = workspace.state.selectedTab;
-  const selectedSlot = workspace.settingsOpen ? -1 : primaryTabs.indexOf(selectedTab);
+  const selectedSlot = Math.max(0, primaryTabs.indexOf(selectedTab));
+  const selectedScreenKey = NATIVE_WORKSPACE_TAB_SLOTS[selectedSlot]!;
   const request = useMemo(
     () => ({
-      selectedScreenKey:
-        selectedSlot === -1 ? "settings" : NATIVE_WORKSPACE_TAB_SLOTS[selectedSlot]!,
+      selectedScreenKey,
       baseProvenance: provenance,
     }),
-    [selectedSlot, provenance],
+    [selectedScreenKey, provenance],
   );
   return (
     <View style={{ flex: 1 }}>
@@ -95,16 +91,6 @@ export function WorkspaceNativeTabs(props: {
           tabBarMinimizeBehavior: "never",
           tabBarTintColor: colors["--color-primary"],
         }}
-        onTabSelectionPrevented={({
-          nativeEvent,
-        }: NativeSyntheticEvent<TabSelectionPreventedEvent>) => {
-          if (nativeEvent.preventedScreenKey === "settings") {
-            navigation.navigate("SettingsSheet", {
-              screen: "SettingsContent",
-              params: { screen: "Settings" },
-            });
-          }
-        }}
         onTabSelectionRejected={({
           nativeEvent,
         }: NativeSyntheticEvent<TabSelectionRejectedEvent>) =>
@@ -114,14 +100,6 @@ export function WorkspaceNativeTabs(props: {
           setProvenance(nativeEvent.provenance);
           if (nativeEvent.actionOrigin === "programmatic-js") return;
           const tab = workspaceTabForNativeSlot(primaryTabs, nativeEvent.selectedScreenKey);
-          // UIKit sends reselects here even when preventNativeSelection is enabled.
-          if (tab === "settings") {
-            navigation.navigate("SettingsSheet", {
-              screen: "SettingsContent",
-              params: { screen: "Settings" },
-            });
-            return;
-          }
           if (!tab) return;
           Keyboard.dismiss();
           props.onSelect();
@@ -129,34 +107,25 @@ export function WorkspaceNativeTabs(props: {
         }}
       >
         {NATIVE_WORKSPACE_TAB_SLOTS.map((slot, index) => {
-          const settings = slot === "settings";
-          const tab = settings ? (overflow ?? selectedTab) : primaryTabs[index];
+          const tab = primaryTabs[index];
           if (!tab) return null;
           return (
             <Tabs.Screen
-              // Stable slot controllers keep UIKit's stacks attached when a section moves into Settings.
               key={slot}
               screenKey={slot}
               title=""
-              tabBarItemAccessibilityLabel={settings ? "Settings" : WORKSPACE_TAB_LABELS[tab]}
-              preventNativeSelection={settings}
+              tabBarItemAccessibilityLabel={WORKSPACE_TAB_LABELS[tab]}
               ios={{
-                icon: settings
-                  ? { type: "sfSymbol", name: "gearshape" }
-                  : tab === "pullRequests"
+                icon:
+                  tab === "pullRequests"
                     ? { type: "templateSource", templateSource: PULL_REQUEST_ICON }
                     : { type: "sfSymbol", name: NAVIGATION_TAB_ICONS[tab] },
                 selectedIcon:
-                  !settings && tab === "threads"
-                    ? { type: "sfSymbol", name: "text.bubble.fill" }
-                    : undefined,
+                  tab === "threads" ? { type: "sfSymbol", name: "text.bubble.fill" } : undefined,
                 overrideScrollViewContentInsetAdjustmentBehavior: false,
               }}
             >
-              <RetainedWorkspaceTab
-                tab={tab}
-                active={settings ? selectedSlot === -1 : selectedSlot === index}
-              >
+              <RetainedWorkspaceTab tab={tab} active={selectedSlot === index}>
                 {props.children}
               </RetainedWorkspaceTab>
             </Tabs.Screen>
