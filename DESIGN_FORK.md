@@ -59,44 +59,19 @@ First run does an Expo prebuild and CocoaPods install. It takes a while on the
 
 ## Build and upload to TestFlight
 
-Build a signed archive with Xcode's automatic signing, export an App Store IPA,
-then upload with an app-specific password:
+One command builds a signed archive, exports an App Store IPA, and uploads it:
 
 ```bash
 cd apps/mobile
-APP_VARIANT=production EXPO_NO_GIT_STATUS=1 pnpm exec expo prebuild --clean --platform ios
-
-xcodebuild \
-  -workspace ios/T3Code.xcworkspace \
-  -scheme T3Code \
-  -configuration Release \
-  -destination 'generic/platform=iOS' \
-  -archivePath "$PWD/build/T3CodeDesign.xcarchive" \
-  -allowProvisioningUpdates \
-  -authenticationKeyPath "$HOME/private_keys/AuthKey_66WZZP9YM6.p8" \
-  -authenticationKeyID 66WZZP9YM6 \
-  -authenticationKeyIssuerID 684ca00b-6308-4d13-abe8-d67b36f218d9 \
-  archive
+scripts/build-testflight.sh
 ```
 
-Export and upload:
+Use `--clean` after changing native dependencies or config plugins, and
+`--no-upload` to stop after the IPA is built.
 
-```bash
-xcodebuild -exportArchive \
-  -archivePath "$PWD/build/T3CodeDesign.xcarchive" \
-  -exportPath "$PWD/build/export" \
-  -exportOptionsPlist scripts/testflight-export-options.plist \
-  -allowProvisioningUpdates \
-  -authenticationKeyPath "$HOME/private_keys/AuthKey_66WZZP9YM6.p8" \
-  -authenticationKeyID 66WZZP9YM6 \
-  -authenticationKeyIssuerID 684ca00b-6308-4d13-abe8-d67b36f218d9
-
-xcrun altool --upload-app \
-  -f "$PWD/build/export/T3CodeDesign.ipa" \
-  -t ios \
-  -u 8041lobo@gmail.com \
-  -p "$(cat "$HOME/.secrets/asc-app-password")"
-```
+The script reads its signing identity from the repo-root `.env`. It uses an
+App Store Connect API key for Xcode's automatic signing and an app-specific
+password for `altool` upload. Neither secret belongs in git.
 
 App Store Connect record: `T3 Code Design` (`com.russellsystems.t3design`).
 
