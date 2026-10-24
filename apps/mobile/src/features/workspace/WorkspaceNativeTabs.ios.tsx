@@ -5,11 +5,7 @@ import {
 } from "./navigation-tabs";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { Keyboard, View, useWindowDimensions, type NativeSyntheticEvent } from "react-native";
-import {
-  Tabs,
-  type TabSelectedEvent,
-  type TabSelectionRejectedEvent,
-} from "react-native-screens";
+import { Tabs, type TabSelectedEvent, type TabSelectionRejectedEvent } from "react-native-screens";
 
 import { WorkspaceTabsContext, useWorkspaceTabs } from "./WorkspaceTabsContext";
 import {

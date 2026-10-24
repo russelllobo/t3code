@@ -47,9 +47,7 @@ import { buildHomeProjectScopes } from "../home/homeThreadList";
 import { SwipeableScrollGateProvider, useSwipeableScrollGate } from "../home/thread-swipe-actions";
 import { usePendingTaskListActions } from "../home/usePendingTaskListActions";
 import { useThreadListActions } from "../home/useThreadListActions";
-import {
-  getConnectionAwareBrandHeaderOptions,
-} from "../home/WorkspaceConnectionTitle";
+import { getConnectionAwareBrandHeaderOptions } from "../home/WorkspaceConnectionTitle";
 import { T3EnvironmentHeader } from "../home/T3EnvironmentHeader";
 import { ThreadListToolbar } from "../home/ThreadListToolbar";
 import { useToolbarLayout } from "../../components/ui/useToolbarLayout";

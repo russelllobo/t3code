@@ -26,9 +26,7 @@ export function T3EnvironmentHeader(props: {
         .map((connection) => ({
           environmentId: connection.environmentId,
           label: connection.environmentLabel,
-          icon: (isRelayManagedConnection(connection)
-            ? "cloud"
-            : "terminal") as AppSymbolName,
+          icon: (isRelayManagedConnection(connection) ? "cloud" : "terminal") as AppSymbolName,
         }))
         .sort((a, b) => a.label.localeCompare(b.label)),
     [savedConnectionsById],
