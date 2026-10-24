@@ -1,5 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
-import { selectedNavigationTab, visibleNavigationTabs } from "./navigation-tab-order";
+import { visibleNavigationTabs } from "./navigation-tab-order";
 import { requireNativeView } from "expo";
 import type { NativeSyntheticEvent, ViewProps } from "react-native";
 import { useControlTheme } from "../../components/ui/useControlTheme";
@@ -28,9 +27,11 @@ export function WorkspaceSidebarTabs(props: {
   const workspace = useWorkspaceTabs()!;
   const order = useNavigationTabOrder();
   const hidden = useHiddenNavigationTabs();
-  const tabs = [...visibleNavigationTabs(order, hidden), "settings" as const];
-  const navigation = useNavigation();
+  const tabs = visibleNavigationTabs(order, hidden);
   const selectTab = useSelectWorkspaceTab();
+  const selectedTab = tabs.includes(workspace.state.selectedTab)
+    ? workspace.state.selectedTab
+    : tabs[0];
   const { colors, colorScheme } = useControlTheme();
   // UIKit loses accessible names when updating nil-titled items in place.
   const tabBarKey = tabs.join(":");
@@ -38,12 +39,7 @@ export function WorkspaceSidebarTabs(props: {
     <NativeSidebarTabBar
       key={tabBarKey}
       tabs={tabs}
-      selectedTab={selectedNavigationTab(
-        order,
-        workspace.state.selectedTab,
-        workspace.settingsOpen,
-        hidden,
-      )}
+      selectedTab={selectedTab}
       selectedColor={colors["--color-primary"]}
       appearance={colorScheme}
       showsCompose={Boolean(props.onNewTask)}
@@ -51,12 +47,7 @@ export function WorkspaceSidebarTabs(props: {
       onCompose={() => props.onNewTask?.()}
       onSelectionChange={({ nativeEvent }) => {
         const tab = tabs.find((candidate) => candidate === nativeEvent.tab);
-        if (tab === "settings")
-          navigation.navigate("SettingsSheet", {
-            screen: "SettingsContent",
-            params: { screen: "Settings" },
-          });
-        else if (tab) selectTab(tab);
+        if (tab) selectTab(tab);
       }}
       // Keep the host stable while UIKit updates the bars' intrinsic size and safe area together.
       style={{
